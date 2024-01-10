@@ -2,6 +2,7 @@ package generics;
 
 import java.util.LinkedList;
 import java.util.Optional;
+import java.util.function.Function;
 
 public class Buffer<T> {
 
@@ -10,7 +11,15 @@ public class Buffer<T> {
     *
      */
 
-    private final LinkedList<T> elements = new LinkedList<>();
+    private final LinkedList<T> elements;
+
+    public Buffer(){ // incluindo construtor para as alterações implementadas com o método transform
+        this(new LinkedList<>());
+    }
+
+    private Buffer(LinkedList<T> elements) { // construtor que será usado no método transform
+        this.elements = elements;
+    }
 
     public void add(T element) {
         elements.addLast(element);
@@ -21,5 +30,10 @@ public class Buffer<T> {
             return Optional.empty(); // usando um Optional eliminamos problemas com Exceções
         }
         return Optional.of(elements.removeFirst());
+    }
+
+    // colocando o tipo parametrizado antes informamos ao java que ele pode ser usado por esse método para executar sua operação e assim não mexemos no generics da classe
+    public <K> Buffer <K> transform(Function<T, K> function) { // k não existe fora do contexto do método
+        return new Buffer<>(new LinkedList<>(elements.stream().map(function).toList())); // método recebe uma função, pega tudo que é T e transforma em K (pode ser qualquer coisa)
     }
 }
